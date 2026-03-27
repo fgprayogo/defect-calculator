@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Defect Kopi SNI</title>
+
+<style>
+:root{
+--bg:#f4f6f8;
+--card:#ffffff;
+--primary:#af4c2b;
+--border:#e0e0e0;
+}
+
+body{
+font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto;
+background:var(--bg);
+margin:0;
+padding-bottom:140px;
+}
+
+.header{
+background:var(--primary);
+color:white;
+padding:15px;
+text-align:center;
+font-weight:bold;
+font-size:18px;
+position:sticky;
+top:0;
+z-index:2;
+}
+
+.mode{
+display:flex;
+gap:10px;
+padding:10px;
+background:white;
+border-bottom:1px solid var(--border);
+position:sticky;
+top:52px;
+z-index:2;
+}
+
+.mode button{
+flex:1;
+padding:10px;
+border-radius:8px;
+border:1px solid var(--border);
+background:#eee;
+font-weight:bold;
+}
+
+.mode button.active{
+background:var(--primary);
+color:white;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+padding:15px;
+}
+
+.card{
+background:var(--card);
+border-radius:12px;
+padding:15px;
+box-shadow:0 4px 10px rgba(0,0,0,0.05);
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:10px 0;
+border-bottom:1px solid var(--border);
+}
+
+.row:last-child{border-bottom:none}
+
+.label{font-size:14px;font-weight:500}
+.value{font-size:12px;color:#777}
+
+input{
+width:70px;
+padding:7px;
+border-radius:6px;
+border:1px solid var(--border);
+text-align:right;
+font-size:14px;
+}
+
+.footer{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+background:white;
+border-top:1px solid var(--border);
+padding:12px 15px;
+box-shadow:0 -5px 10px rgba(0,0,0,0.05);
+}
+
+.total{font-size:18px;font-weight:bold}
+.grade{font-size:20px;font-weight:bold;margin-top:4px}
+
+.grade.g1{color:#2e7d32}
+.grade.g2{color:#558b2f}
+.grade.g3{color:#f9a825}
+.grade.g4{color:#ef6c00}
+.grade.g5{color:#d84315}
+.grade.g6{color:#b71c1c}
+
+.reset{
+margin-top:8px;
+background:#eee;
+border:none;
+padding:10px;
+border-radius:8px;
+width:100%;
+font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+Kalkulator Defect Kopi SNI ☕
+</div>
+
+<div class="mode">
+<button id="btnFull" class="active">Full SNI</button>
+<button id="btnSimple">Simplified QC</button>
+</div>
+
+<div class="container">
+<div class="card" id="inputs"></div>
+</div>
+
+<div class="footer">
+<div class="total">Total Defect: <span id="total">0</span></div>
+<div class="grade" id="grade">Grade -</div>
+<button class="reset" onclick="resetAll()">Reset</button>
+</div>
+
+<script>
+
+const fullDefects = [
+["Biji Hitam",1],
+["Hitam Sebagian",0.5],
+["Hitam Pecah",0.5],
+["Biji Coklat",0.25],
+["Pecah Sebelah",0.2],
+["Biji Muda",0.2],
+["Berlubang 1",0.1],
+["Berlubang >1",0.2],
+["Bertutul",0.1],
+["Berkulit Tanduk",0.5],
+["Kulit Besar",1],
+["Kulit Sedang",0.5],
+["Kulit Kecil",0.2],
+["Kulit Tanduk Besar",0.5],
+["Kulit Tanduk Sedang",0.2],
+["Kulit Tanduk Kecil",0.1],
+["Biji Mengelupas",0.2],
+["Biji Keriput",0.2],
+["Benda Asing Sedang",2],
+["Benda Asing Besar",5]
+];
+
+const simpleDefects = [
+["Hitam",1],
+["Hitam Sebagian",0.5],
+["Pecah",0.2],
+["Berlubang",0.1],
+["Biji Muda",0.2],
+["Kulit",0.2],
+["Benda Asing",2]
+];
+
+let current = fullDefects;
+
+const container = document.getElementById("inputs");
+
+function render(){
+container.innerHTML="";
+current.forEach((d,i)=>{
+const row=document.createElement("div");
+row.className="row";
+
+row.innerHTML=`
+<div>
+<div class="label">${d[0]}</div>
+<div class="value">${d[1]} poin</div>
+</div>
+<input type="number" min="0" data-index="${i}">
+`;
+
+container.appendChild(row);
+});
+
+document.querySelectorAll("input").forEach(i=>{
+i.addEventListener("input",calculate);
+});
+calculate();
+}
+
+function calculate(){
+let total=0;
+
+document.querySelectorAll("input").forEach(input=>{
+let qty=parseFloat(input.value)||0;
+let val=current[input.dataset.index][1];
+total+=qty*val;
+});
+
+total=parseFloat(total.toFixed(2));
+document.getElementById("total").innerText=total;
+
+const grade=getGrade(total);
+const gradeEl=document.getElementById("grade");
+gradeEl.innerText=grade.text;
+gradeEl.className="grade "+grade.class;
+}
+
+function getGrade(t){
+if(t<=11) return {text:"Grade 1",class:"g1"};
+if(t<=25) return {text:"Grade 2",class:"g2"};
+if(t<=44) return {text:"Grade 3",class:"g3"};
+if(t<=60) return {text:"Grade 4a",class:"g4"};
+if(t<=80) return {text:"Grade 4b",class:"g4"};
+if(t<=150) return {text:"Grade 5",class:"g5"};
+return {text:"Grade 6",class:"g6"};
+}
+
+function resetAll(){
+document.querySelectorAll("input").forEach(i=>i.value=0);
+calculate();
+}
+
+document.getElementById("btnFull").onclick=()=>{
+current=fullDefects;
+document.getElementById("btnFull").classList.add("active");
+document.getElementById("btnSimple").classList.remove("active");
+render();
+}
+
+document.getElementById("btnSimple").onclick=()=>{
+current=simpleDefects;
+document.getElementById("btnSimple").classList.add("active");
+document.getElementById("btnFull").classList.remove("active");
+render();
+}
+
+render();
+
+</script>
+
+</body>
+</html>
