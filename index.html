@@ -75,8 +75,9 @@ box-shadow:0 4px 10px rgba(0,0,0,0.05);
 }
 
 .row{
-display:flex;
-justify-content:space-between;
+display:grid;
+grid-template-columns: 1fr 80px 70px;
+gap:10px;
 align-items:center;
 padding:10px 0;
 border-bottom:1px solid var(--border);
@@ -130,6 +131,14 @@ border-radius:8px;
 width:100%;
 font-weight:bold;
 }
+
+.subtotal{
+width:60px;
+text-align:right;
+font-weight:bold;
+color:#555;
+}
+
 </style>
 </head>
 
@@ -205,6 +214,8 @@ row.innerHTML=`
 <div class="value">${d[1]} poin</div>
 </div>
 <input type="number" min="0" data-index="${i}">
+
+<div class="subtotal" id="sub-${i}">0</div>
 `;
 
 container.appendChild(row);
@@ -222,7 +233,12 @@ let total=0;
 document.querySelectorAll("input").forEach(input=>{
 let qty=parseFloat(input.value)||0;
 let val=current[input.dataset.index][1];
-total+=qty*val;
+let sub=qty*val;
+
+document.getElementById("sub-"+input.dataset.index)
+.innerText=sub.toFixed(2);
+
+total+=sub;
 });
 
 total=parseFloat(total.toFixed(2));
